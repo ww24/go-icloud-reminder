@@ -1,15 +1,11 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 	"os"
-	"time"
+
+	"github.com/ww24/go-icloud-reminder/icloud"
 )
 
 const (
@@ -25,78 +21,30 @@ var (
 )
 
 func main() {
-	err := login(iCloudID, iCloudPW)
+	iCloud, err := icloud.New(&icloud.Config{
+		ID:       iCloudID,
+		Password: iCloudPW,
+		XAppleWebauth: &icloud.XAppleWebauth{
+			User:  xAppleWebauthUser,
+			Token: xAppleWebauthToken,
+		},
+	})
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
-}
 
-func login(id, pw string) error {
-	payload := map[string]interface{}{
-		"apple_id":       id,
-		"password":       pw,
-		"extended_login": false,
-	}
-	data, err := json.Marshal(payload)
+	reminder, err := iCloud.NewReminder()
 	if err != nil {
-		return err
+		log.Fatalln("Error:", err)
 	}
-
-	jar, err := cookiejar.New(nil)
+	taskRes, err := reminder.GetCompleted()
 	if err != nil {
-		log.Fatal(err)
-	}
-	u, err := url.Parse(iCloudValidateEndpoint)
-	if err != nil {
-		log.Fatal(err)
-	}
-	jar.SetCookies(u, []*http.Cookie{{
-		Name:  "X-APPLE-WEBAUTH-USER",
-		Value: xAppleWebauthUser,
-	}, {
-		Name:  "X-APPLE-WEBAUTH-TOKEN",
-		Value: xAppleWebauthToken,
-	}})
-
-	client := &http.Client{
-		Timeout: time.Second * 30,
-		Jar:     jar,
+		log.Fatalln("Error:", err)
 	}
 
-	query := url.Values{
-		"dsid": {dsid},
-	}
-	uri := fmt.Sprintf("%s?%s", iCloudValidateEndpoint, query.Encode())
-	log.Println("uri:", uri)
-	req, err := http.NewRequest("POST", uri, bytes.NewReader(data))
-	if err != nil {
-		return err
+	for _, task := range taskRes.Reminders {
+		fmt.Printf("%s: %+v\n\n", task.Title, task)
 	}
 
-	req.Header.Add("Origin", "https://www.icloud.com")
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-
-	res := make(map[string]interface{})
-	err = decoder.Decode(&res)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Header:")
-	for k, v := range resp.Header {
-		fmt.Printf("%s: %+v\n", k, v)
-	}
-
-	fmt.Println(resp.Status)
-	fmt.Printf("res: %+v\n", res)
-
-	return nil
+	log.Printf("error: %+v\n", taskRes.Error)
 }
