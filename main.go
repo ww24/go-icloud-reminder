@@ -15,7 +15,6 @@ const (
 var (
 	iCloudID           = os.Getenv("ICLOUD_ID")
 	iCloudPW           = os.Getenv("ICLOUD_PW")
-	dsid               = os.Getenv("DSID")
 	xAppleWebauthUser  = os.Getenv("X_APPLE_WEBAUTH_USER")
 	xAppleWebauthToken = os.Getenv("X_APPLE_WEBAUTH_TOKEN")
 )
@@ -37,14 +36,21 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
-	taskRes, err := reminder.GetCompleted()
+
+	startupRes, err := reminder.Startup()
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
 
-	for _, task := range taskRes.Reminders {
-		fmt.Printf("%s: %+v\n\n", task.Title, task)
-	}
+	for _, col := range startupRes.Collections {
+		fmt.Printf("\n## title: %s, id: %s\n", col.Title, col.GUID)
 
-	log.Printf("error: %+v\n", taskRes.Error)
+		taskRes, err := reminder.GetTasks(col.GUID)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+		for _, task := range taskRes.Reminders {
+			fmt.Printf("%s: %+v\n\n", task.Title, task)
+		}
+	}
 }

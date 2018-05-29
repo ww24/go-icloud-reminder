@@ -1,10 +1,6 @@
 package entity
 
-type Error struct {
-	Errorcode    interface{} `json:"errorcode"`
-	Message      string      `json:"message"`
-	Authmismatch bool        `json:"authmismatch"`
-}
+import "fmt"
 
 type ValidateResponse struct {
 	Error
@@ -25,6 +21,18 @@ type ValidateResponse struct {
 	PcsDeleted                   bool         `json:"pcsDeleted"`
 	ICloudInfo                   *ICloudInfo  `json:"iCloudInfo"`
 	Apps                         *Apps        `json:"apps"`
+}
+
+type Error struct {
+	Status       int         `json:"status"`
+	Errorcode    interface{} `json:"errorcode"`
+	Message      string      `json:"message"`
+	Authmismatch bool        `json:"authmismatch"`
+}
+
+func (e Error) Error() string {
+	return fmt.Sprintf("{Status:%d Errorcode:%+v Message:%s Authmismatch:%v}",
+		e.Status, e.Errorcode, e.Message, e.Authmismatch)
 }
 
 type AppleIDEntity struct {

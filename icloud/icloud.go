@@ -78,7 +78,9 @@ func (i *iCloud) request(method, uri string, body io.Reader, entity interface{})
 	err = decoder.Decode(entity)
 	if err != nil {
 		log.Println("DEBUG:", resp.Status)
+		log.Println("ERROR:", err)
 		log.Println(string(buf.Bytes()))
+		return err
 	}
 	return nil
 }
@@ -138,7 +140,7 @@ func (i *iCloud) NewReminder() (Reminder, error) {
 }
 
 // New returns ICloudService.
-func New(c *Config) (ICloudService, error) {
+func New(c *Config) (Service, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, err
