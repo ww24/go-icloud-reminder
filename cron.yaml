@@ -1,0 +1,7 @@
+cron:
+- description: "sync reminder"
+  url: /tasks/sync_reminder
+  schedule: every 2 minutes
+  retry_parameters:
+    min_backoff_seconds: 3
+    max_doublings: 3

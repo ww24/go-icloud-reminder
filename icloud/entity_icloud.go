@@ -1,6 +1,14 @@
-package entity
+package icloud
 
-import "fmt"
+import (
+	"fmt"
+)
+
+type loginRequest struct {
+	AppleID       string `json:"apple_id"`
+	Password      string `json:"password"`
+	ExtendedLogin bool   `json:"extended_login"`
+}
 
 type ValidateResponse struct {
 	Error
@@ -24,6 +32,9 @@ type ValidateResponse struct {
 }
 
 type Error struct {
+	InitSuccess bool   `json:"success"`
+	InitError   string `json:"error"`
+
 	Status       int         `json:"status"`
 	Errorcode    interface{} `json:"errorcode"`
 	Message      string      `json:"message"`
@@ -31,8 +42,7 @@ type Error struct {
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("{Status:%d Errorcode:%+v Message:%s Authmismatch:%v}",
-		e.Status, e.Errorcode, e.Message, e.Authmismatch)
+	return fmt.Sprintf("%#v", e)
 }
 
 type AppleIDEntity struct {

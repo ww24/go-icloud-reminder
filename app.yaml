@@ -1,0 +1,24 @@
+runtime: go
+api_version: go1.9
+
+threadsafe: true
+instance_class: F1
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: 1
+  min_pending_latency: 3000ms
+  max_pending_latency: automatic
+
+handlers:
+- url: /setup
+  script: _go_app
+  login: admin
+
+- url: /tasks/sync_reminder
+  script: _go_app
+  login: admin
+
+- url: /.*
+  static_dir: static
+
+env_variables:

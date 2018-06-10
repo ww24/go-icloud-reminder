@@ -1,4 +1,4 @@
-package entity
+package icloud
 
 type TasksResponse struct {
 	Error

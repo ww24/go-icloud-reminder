@@ -2,8 +2,6 @@ package icloud
 
 import (
 	"fmt"
-
-	"github.com/ww24/go-icloud-reminder/entity"
 )
 
 const (
@@ -17,8 +15,8 @@ type reminder struct {
 	i        *iCloud
 }
 
-func (r *reminder) Startup() (*entity.StartupResponse, error) {
-	entity := new(entity.StartupResponse)
+func (r *reminder) Startup() (*StartupResponse, error) {
+	entity := new(StartupResponse)
 	uri := r.endpoint + getStartupPath
 	err := r.i.request("GET", uri, nil, entity)
 	if err != nil {
@@ -30,8 +28,8 @@ func (r *reminder) Startup() (*entity.StartupResponse, error) {
 	return entity, nil
 }
 
-func (r *reminder) GetTasks(guid string) (*entity.TasksResponse, error) {
-	entity := new(entity.TasksResponse)
+func (r *reminder) GetTasks(guid string) (*TasksResponse, error) {
+	entity := new(TasksResponse)
 	uri := r.endpoint + fmt.Sprintf(getTasksPathFormat, guid)
 	err := r.i.request("GET", uri, nil, entity)
 	if err != nil {
@@ -43,8 +41,8 @@ func (r *reminder) GetTasks(guid string) (*entity.TasksResponse, error) {
 	return entity, nil
 }
 
-func (r *reminder) GetCompleted() (*entity.TasksResponse, error) {
-	entity := new(entity.TasksResponse)
+func (r *reminder) GetCompleted() (*TasksResponse, error) {
+	entity := new(TasksResponse)
 	uri := r.endpoint + getCompletedPath
 	err := r.i.request("GET", uri, nil, entity)
 	if err != nil {
