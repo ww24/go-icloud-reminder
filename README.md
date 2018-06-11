@@ -1,20 +1,13 @@
-# iCloud の API を使いたいが公開されてないようなので iCloud Web の API を非公式に叩くやつ
+# iCloud Reminder Web API client for GAE go
 
-Work in progress.
+## Usage
 
-## Requirements
-- envrc
+### Setup
+`/setup` を開いて、 iCloud ID と Password を入力。
 
-## 使い方
-事前にログイン
+2FA が有効な場合はリダイレクトされて戻ってくるので、 追加で Verification code も入力します。
 
-https://www.icloud.com/
+認証に成功すると Cloud Datastore の Secret という Entity Kind で `X-APPLE-WEBAUTH-USER`, `X-APPLE-WEBAUTH-TOKEN` が保存されます。
 
-1. Cookie の `X-APPLE-WEBAUTH-USER`, `X-APPLE-WEBAUTH-TOKEN` を取り出す。
-1. 2段階認証が有効の場合にいつものパスワードは使えないので、 [App 用パスワード](https://support.apple.com/ja-jp/HT204397) を発行する。
-
-それらを起動時に環境変数で渡す。 [direnv](https://github.com/direnv/direnv) 使うと便利。
-
-```
-ICLOUD_ID=xxx ICLOUD_PW=xxx X_APPLE_WEBAUTH_USER=xxx X_APPLE_WEBAUTH_TOKEN=xxx go run main.go
-```
+### Cron
+認証設定後は、一定間隔で Reminder が Cloud Datastore の Reminder という Entity Kind で同期されます。
